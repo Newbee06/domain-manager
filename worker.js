@@ -334,7 +334,7 @@ export default {
     if(path.startsWith('/api/')){try{return await apiHandler(request,env,path,ctx)}catch(e){console.error(e);return json({error:'服务器内部错误'},500)}}
     const adminHost=normalizeHost(env.ADMIN_HOST||'');
     if(adminHost&&host===adminHost){try{if(path==='/'||path==='/admin'){if(await authenticated(request,env))return adminPage();return loginPage()}const dm=path.match(/^\/admin\/domain\/(\d+)$/);if(dm){if(await authenticated(request,env))return domainDetailPage(Number(dm[1]));return loginPage()}return html('Not Found',404)}catch(e){console.error('admin page error',e);return html('系统暂时无法打开，请稍后刷新。',500)}}
-    const domain=await getDomain(env,host);if(!domain)return html('This domain is not configured.',404);ctx.waitUntil(recordVisit(env,request,domain.id).catch(()=>{}));if(!domain.enabled)return pausedPage(domain.paused_message);const target=new URL(domain.target_url);target.pathname='/';target.search='';target.hash='';return Response.redirect(target.toString(),Number(domain.redirect_type)===301?301:302);
+    const domain=await getDomain(env,host);if(!domain)return html('This domain is not configured.',404);ctx.waitUntil(recordVisit(env,request,domain.id).catch(()=>{}));if(!domain.enabled)return pausedPage(domain.paused_message);const target=new URL(domain.target_url);return Response.redirect(target.toString(),Number(domain.redirect_type)===301?301:302);
   },
   async scheduled(controller, env, ctx) {
     try {
